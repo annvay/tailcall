@@ -156,3 +156,30 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: apply lint fixes"
+ benchmark:
+  runs-on: ubuntu-latest
+
+  steps:
+  - name: Checkout code
+    uses: actions/checkout@v2
+
+  - name: Set up Rust
+    uses: actions-rs/toolchain@v1
+    with:
+      toolchain: stable
+      override: true
+
+  - name: Install Criterion
+    run: cargo install cargo-criterion
+
+  - name: Cache Criterion Benchmarks
+    uses: actions/cache@v2
+    with:
+      path: target/criterion
+      key: criterion_benchmarks_${{ github.sha }}
+
+  - name: Run Criterion Benchmarks
+    run: cargo criterion
+
+  - name: Print Benchmark Results
+    run: cat target/criterion/report/index.html
